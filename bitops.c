@@ -40,16 +40,23 @@ unsigned getbits(unsigned x, int p, int n) {
 unsigned setbits(unsigned x, int p, int n, int y) {
     
     // extract the rightmost n bits of y
-
+    unsigned mask_y = ~(~0 << n);
+    y = y & mask_y;
+    
     // left-shift y so that the right-most n bits of y
     // aligns with the bits in x that needs to be replaced.
+    y = y << (p+1-n);
 
     // make a mask with the positions in x to be replaced.
-
+    unsigned mask_x = ~(~0 << n);
+    mask_x = mask_x << (p+1-n);
+    
     // set the bits to be replaced in x to 0 using the mask
-
+    x = x & ~(mask_x);
+    
     // set the bits to be replaced in x using y
-
+    x = x | y;
+    
     return x;
 }
 
@@ -60,9 +67,12 @@ unsigned setbits(unsigned x, int p, int n, int y) {
  */
 unsigned invert(unsigned x, int p, int n) {
     
-    // make a mask with the positions in x to be inverted 
-
+    // make a mask with the positions in x to be inverted
+    unsigned mask_x = ~(~0 << n);
+    mask_x = mask_x << (p + 1 - n);
+    
     // flip the bits in x using the mask.
+    x = x ^ mask_x;
     
     return x;    
 }
@@ -74,15 +84,24 @@ unsigned invert(unsigned x, int p, int n) {
 unsigned rightrot(unsigned x, int n) {
 
     // make a mask for the Most Significant Bit (MSB)
+    unsigned mask_most = ~(~0u >> 1);
 
     // repeat the following n times.
-    
-    // extract Least Significant Bit (LSB)
 
-    // shift x right by 1
+    for(int i = 0; i < n; i++){
+        // extract Least Significant Bit (LSB)
+        unsigned mask_least = 0x1;
+        unsigned lsb = x & mask_least;
 
-    // set MSB in x to 1 if the extracted LSB bit was 1.
-    // - use the mask created above to do this.
+        // shift x right by 1
+        x = x >> 1;
+
+        // set MSB in x to 1 if the extracted LSB bit was 1.
+        // - use the mask created above to do this.
+        if (lsb){
+            x = x | mask_most; 
+        }
+    }
 
     return x;
 }
